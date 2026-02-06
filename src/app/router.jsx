@@ -1,8 +1,10 @@
 import { createBrowserRouter, UNSAFE_RSCDefaultRootErrorBoundary } from "react-router-dom";
-import Login from "../pages/login";
+import Login from "../pages/Login";
 import Error from "../components/Error";
 import AdminLayout from "../layouts/AdminLayout";
 import UserLayout from "../layouts/UserLayout"
+import ProtectedRoute from "../layouts/ProtectedRoutes";
+import MyProfile from "../pages/MyProfile";
 
 const router = createBrowserRouter([
   {
@@ -18,57 +20,65 @@ const router = createBrowserRouter([
     element: <Login />
   },
 
-
   // Admin Layout
   {
-    path: "/admin",
-    element: <AdminLayout />,
+    element: <ProtectedRoute allowedRoles={[1]} />,
     children: [
         {
-            path: "myprofile",
-            element: <div>My Profile</div>
-        },
-        {
-            path: "projects",
-            element: <div>Projects</div>
-        },
-        {
-            path: "tasks",
-            element: <div>Tasks</div>
-        },
-        {
-            path: "mytask",
-            element: <div>My Task</div>
-        },
+            path: "/admin",
+            element: <AdminLayout />,
+            children: [
+                {
+                    path: "myprofile",
+                    element: <MyProfile />
+                },
+                {
+                    path: "projects",
+                    element: <div>Projects</div>
+                },
+                {
+                    path: "tasks",
+                    element: <div>Tasks</div>
+                },
+                {
+                    path: "mytask",
+                    element: <div>My Task</div>
+                },
+            ]
+        }
     ]
   },
 
-  // User Layout
+
   {
-    path: "/user",
-    element: <UserLayout />,
+    element: <ProtectedRoute allowedRoles={[2]} />,
     children: [
         {
-            path: "myprofile",
-            element: <div>My Profile</div>
-        },
-        {
-            path: "projects",
-            element: <div>Projects</div>
-        },
-        // {
-        //     path: "tasks",
-        //     element: <div>Tasks</div>
-        // },
-        {
-            path: "mytask",
-            element: <div>My Task</div>
-        },
+            path: "/user",
+            element: <UserLayout />,
+            children: [
+                {
+                    path: "myprofile",
+                    element: <MyProfile />
+                },
+                {
+                    path: "projects",
+                    element: <div>Projects</div>
+                },
+                // {
+                //     path: "tasks",
+                //     element: <div>Tasks</div>
+                // },
+                {
+                    path: "mytask",
+                    element: <div>My Task</div>
+                },
 
+            ]
+        }
     ]
   },
-
-
+  // User Layout
   {
     path: "*",
     element: <Error />

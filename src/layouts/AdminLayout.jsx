@@ -2,10 +2,21 @@ import { useState } from "react";
 import { Outlet, NavLink, Link } from "react-router-dom";
 import { CircleUserRound } from "lucide-react";
 import taskflow2 from "../assets/taskflow2.png"
+import AdminPanelNav from "../components/AdminPanelNav";
+import { useAuth } from "../context/AuthContext";
+
 const AdminLayout = () => {
 
     const [open, setOpen] = useState(false)
-
+    const { auth, setAuth } = useAuth()
+    const handleLogout = () => {
+        setAuth({
+            token: null,
+            username: null,
+            fullname: null,
+            usertype: null
+        });
+    }
   return (
     <div className="min-h-screen flex bg-gray-100">
 
@@ -16,36 +27,9 @@ const AdminLayout = () => {
                 <img className="w-9 h-8" src={taskflow2}/>
                 <div className="bg-gradient-to-r from-fuchsia-500 via-violet-500 to-sky-500 bg-clip-text text-transparent">TaskFlow</div>
             </div>
-        <nav className="flex-1 p-4 space-y-2">
 
-          <NavLink
-            to="/admin/myprofile"
-            className="block px-4 py-2 rounded-md hover:bg-gray-800 transition"
-          >
-            My Profile
-          </NavLink>
+            <AdminPanelNav />
 
-          <NavLink
-            to="/admin/projects"
-            className="block px-4 py-2 rounded-md hover:bg-gray-800 transition"
-          >
-            Projects
-          </NavLink>
-
-          <NavLink
-            to="/admin/tasks"
-            className="block px-4 py-2 rounded-md hover:bg-gray-800 transition"
-          >
-            Tasks
-          </NavLink>
-          <NavLink
-            to="/admin/mytask"
-            className="block px-4 py-2 rounded-md hover:bg-gray-800 transition"
-          >
-            My Tasks
-          </NavLink>
-
-        </nav>
       </aside>
 
       {/* Main Area */}
@@ -53,32 +37,32 @@ const AdminLayout = () => {
 
         {/* Header */}
         <header className="h-16 bg-white shadow-lg flex items-center px-6 justify-end-safe">
-          {/* <h1 className="text-lg font-semibold text-gray-800">
-            Admin Dashboard
-          </h1> */}
-        <div className="relative">
-        <button
-            onClick={() => setOpen(!open)}
-            className="p-1 rounded-full hover:bg-gray-200 transition"
-        >
-            <CircleUserRound className="w-7 h-7 text-gray-700" />
-        </button>
+          <h1 className="text-lg font-semibold text-gray-800">
+            {auth?.fullname}
+          </h1>
+            <div className="relative">
+            <button
+                onClick={() => setOpen(!open)}
+                className="p-1 rounded-full hover:bg-gray-200 transition"
+            >
+                <CircleUserRound className="w-7 h-7 text-gray-700" />
+            </button>
 
-        {open && (
-            <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border-t border-blue-600 overflow-hidden">
-                <Link to="/admin/myprofile">
-                    <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 font-bold">
-                        My Profile
-                    </button>
-                </Link>
-                <Link to="/login">
-                    <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600 font-bold">
-                        Logout
-                    </button>
-                </Link>
+            {open && (
+                <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border-t border-blue-600 overflow-hidden">
+                    <Link to="/admin/myprofile">
+                        <button onClick={() => setOpen(!open)} className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 font-bold">
+                            My Profile
+                        </button>
+                    </Link>
+                    <Link to="/login">
+                        <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600 font-bold">
+                            Logout
+                        </button>
+                    </Link>
+                </div>
+            )}
             </div>
-        )}
-        </div>
         </header>
 
         {/* Page Content */}

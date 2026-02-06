@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import * as authService from "../services/auth.service"
+import { useAuth } from "../context/AuthContext";
+
 const Login = () => {
 
     // const [formData, setFormData] = useState({
     //     username: "",
     //     password: ""
     // })
-
+    const {setAuth} = useAuth()
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [errors, setErrors] = useState({})
@@ -16,6 +19,7 @@ const Login = () => {
         password: false
     });
     const navigate = useNavigate()
+    const location = useLocation();
 
     useEffect(() => {
     const newErrors = { ...errors };
@@ -65,7 +69,7 @@ const Login = () => {
         return true;
 
     }
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault()
         setTouched({
             username: true,
@@ -73,23 +77,44 @@ const Login = () => {
         });
         if(!validate()) return;
 
-        const currentPath = location.pathname;
-        if (currentPath === "/login") {
-            console.log("Admin login");
+        try{
+            const data = { username, password };
+            const getResult = await authService.login(data)
+            if(getResult.result) {
+                const result = getResult.result
+                // setAuth({token: result.token, username: result.username, usertype: result.usertype})
 
-            navigate('/admin/myprofile')
-        }
-        else if (currentPath === "/") {
-            console.log("User login");
-            navigate('/user/myprofile')
+                // setAuth(localStorage.setItem("auth", JSON.stringify({
+                //     token: result.token, username: result.username, usertype: result.usertype
+                // })))
+
+                setAuth({
+                    token: result.token,
+                    username: result.username,
+                    fullname: result.fullname,
+                    usertype: result.usertype
+                });
+                const currentPath = location.pathname;
+                if (currentPath === "/login") {
+                    result.usertype === 1 ? navigate('/admin/myprofile') : alert("Unauthorized! Please Enter Valid Credentials")
+                }
+                else if (currentPath === "/") {
+                    result.usertype === 2 ? navigate('/user/myprofile') : alert("Unauthorized! Please Enter Valid Credentials")
+
+                }
+                else if (currentPath === "/signin") {
+                    result.usertype === 2 ? navigate('/user/myprofile') : alert("Unauthorized! Please Enter Valid Credentials")
+                }
+            }
+            else{
+                throw Error("Unauthorized! Please Enter Valid Credentials")
+            }
 
         }
-        else if (currentPath === "/signin") {
-            console.log("User login");
-            navigate('/user/myprofile')
+        catch(err){
+            alert(err.message)
         }
     }
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-65 from-gray-900 to-purple-500 px-4">

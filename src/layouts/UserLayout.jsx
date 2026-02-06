@@ -2,9 +2,20 @@ import { useState } from "react";
 import { Outlet, NavLink, Link } from "react-router-dom";
 import { CircleUserRound } from "lucide-react";
 import taskflow2 from "../assets/taskflow2.png"
+import UserPanelNav from "../components/UserPanelNav";
+import { useAuth } from "../context/AuthContext";
 
 const UserLayout = () => {
     const [open, setOpen] = useState(false)
+    const { auth, setAuth } = useAuth()
+    const handleLogout = () => {
+        setAuth({
+            token: null,
+            username: null,
+            fullname: null,
+            usertype: null
+        });
+    }
     
 return (
     <div className="min-h-screen flex bg-gray-100">
@@ -16,36 +27,8 @@ return (
                 <img className="w-9 h-8" src={taskflow2}/>
                 <div className="bg-gradient-to-r from-fuchsia-500 via-violet-500 to-sky-500 bg-clip-text text-transparent">TaskFlow</div>
             </div>
-        <nav className="flex-1 p-4 space-y-2">
 
-          <NavLink
-            to="/user/myprofile"
-            className="block px-4 py-2 rounded-md hover:bg-gray-800 transition"
-          >
-            My Profile
-          </NavLink>
-
-          <NavLink
-            to="/user/projects"
-            className="block px-4 py-2 rounded-md hover:bg-gray-800 transition"
-          >
-            Projects
-          </NavLink>
-
-          {/* <NavLink
-            to="/user/tasks"
-            className="block px-4 py-2 rounded-md hover:bg-gray-800 transition"
-          >
-            Tasks
-          </NavLink> */}
-          <NavLink
-            to="/user/mytask"
-            className="block px-4 py-2 rounded-md hover:bg-gray-800 transition"
-          >
-            My Tasks
-          </NavLink>
-
-        </nav>
+            <UserPanelNav />
       </aside>
 
       {/* Main Area */}
@@ -53,9 +36,9 @@ return (
 
         {/* Header */}
         <header className="h-16 bg-white shadow-lg flex items-center px-6 justify-end-safe">
-          {/* <h1 className="text-lg font-semibold text-gray-800">
-            Admin Dashboard
-          </h1> */}
+          <h1 className="text-lg font-semibold text-gray-800">
+            {auth?.fullname}
+          </h1>
         <div className="relative">
         <button
             onClick={() => setOpen(!open)}
@@ -67,12 +50,12 @@ return (
         {open && (
             <div className="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg border-t border-blue-600 overflow-hidden">
                 <Link to="/user/myprofile">
-                    <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 font-bold">
+                    <button onClick={() => setOpen(!open)} className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 font-bold">
                         My Profile
                     </button>
                 </Link>
                 <Link to="/signin">
-                    <button className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600 font-bold">
+                    <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600 font-bold">
                         Logout
                     </button>
                 </Link>
