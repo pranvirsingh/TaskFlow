@@ -1,17 +1,15 @@
-import { useState } from 'react'
 import '/src/styles/App.css'
-import Login from '../pages/Login'
 import { RouterProvider } from 'react-router-dom'
 import router from './router'
+import { Toaster } from 'react-hot-toast'
 
 function App() {
-    return <RouterProvider router={router} />
-    // return (
-    //     <div className='App'>
-    //         <Login />
-    //     </div>
-    // )
-
+    return (
+        <>
+            <Toaster position='top-right' />
+            <RouterProvider router={router} />
+        </>
+    )
 }
 
 export default App

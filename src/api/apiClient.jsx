@@ -7,21 +7,24 @@ export const apiClient = axios.create({
 });
 
 apiClient.interceptors.request.use(config => {
-  startLoading();
-  const auth = JSON.parse(localStorage.getItem("auth"))
-  if(auth?.token){
-    config.headers.Authorization = `Bearer ${auth.token}`
-  }  
-  return config;
+    startLoading();
+    const auth = JSON.parse(localStorage.getItem("auth"))
+    if (auth?.token) {
+        config.headers.Authorization = `Bearer ${auth.token}`
+    }
+    return config;
 });
 
 apiClient.interceptors.response.use(
-  response => {
-    stopLoading();
-    return response;
-  },
-  error => {
-    stopLoading();
-    return Promise.reject(error);
-  }
+    response => {
+        stopLoading();
+        return response;
+    },
+    error => {
+        stopLoading();
+        if (!error.response) {
+            window.location.href = "/error"
+        }
+        return Promise.reject(error);
+    }
 );
