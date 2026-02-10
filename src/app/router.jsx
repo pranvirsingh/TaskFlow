@@ -7,6 +7,7 @@ import UserLayout from "../layouts/user/UserLayout"
 import ProtectedRoute from "../layouts/ProtectedRoutes";
 import MyProfile_Admin from "../pages/admin/MyProfile";
 import MyProfile from "../pages/user/MyProfile";
+import MemberManager from "../pages/admin/MemberManager";
 
 const router = createBrowserRouter([
     {
@@ -39,8 +40,8 @@ const router = createBrowserRouter([
                         element: <MyProfile_Admin />
                     },
                     {
-                        path: "projects",
-                        element: <div>Projects</div>
+                        path: "membermanager",
+                        element: <MemberManager />
                     },
                     {
                         path: "tasks",

@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom"
-import { LayoutDashboard, FolderKanban, CheckSquare, ListTodo, UserCircle } from "lucide-react"
+import { LayoutDashboard, FolderKanban, CheckSquare, ListTodo, UserCircle, User } from "lucide-react"
 
 const AdminPanelNav = ({ isSidebarOpen }) => {
 
@@ -8,6 +8,7 @@ const AdminPanelNav = ({ isSidebarOpen }) => {
         { to: "/admin/projects", icon: FolderKanban, label: "Projects" },
         { to: "/admin/tasks", icon: ListTodo, label: "Tasks" },
         { to: "/admin/mytask", icon: CheckSquare, label: "My Tasks" },
+        { to: "/admin/membermanager", icon: User, label: "Member Manager" },
     ]
 
     return (

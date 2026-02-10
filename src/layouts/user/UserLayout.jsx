@@ -129,7 +129,7 @@ const UserLayout = () => {
                                     <CircleUserRound className="w-5 h-5" />
                                 </div>
                                 <span className="text-sm font-medium text-gray-700 hidden sm:block">
-                                    {auth?.fullname?.split(' ')[0]}
+                                    {auth?.fullname}
                                 </span>
                             </button>
 
