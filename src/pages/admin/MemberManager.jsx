@@ -3,6 +3,8 @@ import { Plus, Search, Edit2, Trash2, X } from 'lucide-react';
 import Table from '../../components/common/Table';
 import Modal from '../../components/common/Modal';
 import * as userService from '../../services/user.service';
+import { validateFullName, validateEmail, validateMobile } from '../../utils/validators';
+import Loader from '../../components/common/Loader';
 import toast from 'react-hot-toast';
 
 const MemberManager = () => {
@@ -12,6 +14,7 @@ const MemberManager = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
+    const [errors, setErrors] = useState({});
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
@@ -42,7 +45,7 @@ const MemberManager = () => {
         try {
             setLoading(true);
             const result = await userService.getAllUsers();
-            setUsers(result.data || result); // Handle if result wraps data or is array
+            setUsers(result.data || result);
             setFilteredUsers(result.data || result);
         } catch (error) {
             toast.error("Failed to fetch users");
@@ -52,12 +55,36 @@ const MemberManager = () => {
         }
     };
 
+    const validate = () => {
+        const newErrors = {};
+        const fullNameError = validateFullName(formData.fullName);
+        const emailError = validateEmail(formData.email);
+        const mobileError = validateMobile(formData.mobile);
+
+        if (fullNameError) newErrors.fullName = fullNameError;
+        if (emailError) newErrors.email = emailError;
+        if (mobileError) newErrors.mobile = mobileError;
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+
+        if (name === 'mobile') {
+            if (!/^\d*$/.test(value)) return;
+            if (value.length > 10) return;
+        }
+
         setFormData(prev => ({
             ...prev,
             [name]: value
         }));
+
+        if (errors[name]) {
+            setErrors(prev => ({ ...prev, [name]: "" }));
+        }
     };
 
     const resetForm = () => {
@@ -66,6 +93,7 @@ const MemberManager = () => {
             email: '',
             mobile: ''
         });
+        setErrors({});
         setCurrentUser(null);
     };
 
@@ -82,25 +110,28 @@ const MemberManager = () => {
             mobile: user.mobile || ''
         });
         setIsModalOpen(true);
+        setErrors({});
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validate()) {
+            toast.error("Please enter valid details");
+            return;
+        }
+
         try {
             if (currentUser) {
-                // Update
-                // UpdateUserDto: { id, fullName, email, mobile, isActive }
                 const updateData = {
                     ...formData,
                     id: currentUser.id,
-                    isActive: true // Defaulting to true as per common pattern, or could fetch from user
+                    isActive: true
                 };
 
                 await userService.updateUser(updateData);
                 toast.success("User updated successfully");
             } else {
-                // Add
-                // AddUserDto: { fullName, email, mobile }
                 await userService.addUser(formData);
                 toast.success("User added successfully");
             }
@@ -154,16 +185,18 @@ const MemberManager = () => {
 
 
     const handleDelete = async (id) => {
-        confirmDelete(async () => {
-            try {
-                await userService.deleteUser(id);
-                toast.success("User deleted successfully");
-                fetchUsers();
-            } catch (error) {
-                toast.error("Failed to delete user");
-                console.error(error);
-            }
-        });
+        const isConfirmed = window.confirm("Are you sure you want to delete this user?");
+        if (!isConfirmed) return;
+        // confirmDelete(async () => {
+        try {
+            await userService.deleteUser(id);
+            toast.success("User deleted successfully");
+            fetchUsers();
+        } catch (error) {
+            toast.error("Failed to delete user");
+            console.error(error);
+        }
+        // });
     };
 
     const columns = [
@@ -191,12 +224,18 @@ const MemberManager = () => {
         </div>
     );
 
+    if (loading) {
+        return <Loader />
+    }
+
     return (
         <div className="space-y-6">
-            {/* Top Bar */}
+            {blur && (
+                <div className="fixed inset-0 z-50 bg-black/50 transition-opacity duration-300" />
+            )}
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
-                {/* Search */}
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                     <input
@@ -208,7 +247,6 @@ const MemberManager = () => {
                     />
                 </div>
 
-                {/* Add Button */}
                 <button
                     onClick={openAddModal}
                     className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl shadow-lg shadow-purple-500/30 hover:shadow-purple-500/40 hover:-translate-y-0.5 transition-all duration-200 font-medium"
@@ -218,14 +256,12 @@ const MemberManager = () => {
                 </button>
             </div>
 
-            {/* Table */}
             <Table
                 columns={columns}
                 data={filteredUsers}
                 actions={renderActions}
             />
 
-            {/* Modal */}
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
@@ -239,10 +275,10 @@ const MemberManager = () => {
                             name="fullName"
                             value={formData.fullName}
                             onChange={handleInputChange}
-                            required
-                            className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50 transition-all outline-none"
+                            className={`w-full px-4 py-2 rounded-lg border ${errors.fullName ? 'border-red-500 focus:ring-red-500/20' : 'border-gray-200 focus:border-purple-300 focus:ring focus:ring-purple-200'} focus:ring-opacity-50 transition-all outline-none`}
                             placeholder="John Doe"
                         />
+                        {errors.fullName && <p className="text-xs text-red-500 mt-1">{errors.fullName}</p>}
                     </div>
 
                     <div>
@@ -252,10 +288,10 @@ const MemberManager = () => {
                             name="email"
                             value={formData.email}
                             onChange={handleInputChange}
-                            required
-                            className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50 transition-all outline-none"
+                            className={`w-full px-4 py-2 rounded-lg border ${errors.email ? 'border-red-500 focus:ring-red-500/20' : 'border-gray-200 focus:border-purple-300 focus:ring focus:ring-purple-200'} focus:ring-opacity-50 transition-all outline-none`}
                             placeholder="john@example.com"
                         />
+                        {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
                     </div>
 
                     <div>
@@ -265,9 +301,11 @@ const MemberManager = () => {
                             name="mobile"
                             value={formData.mobile}
                             onChange={handleInputChange}
-                            className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50 transition-all outline-none"
-                            placeholder="+1 234 567 8900"
+                            className={`w-full px-4 py-2 rounded-lg border ${errors.mobile ? 'border-red-500 focus:ring-red-500/20' : 'border-gray-200 focus:border-purple-300 focus:ring focus:ring-purple-200'} focus:ring-opacity-50 transition-all outline-none`}
+                            placeholder="10 digit mobile number"
+                            maxLength={10}
                         />
+                        {errors.mobile && <p className="text-xs text-red-500 mt-1">{errors.mobile}</p>}
                     </div>
 
                     <div className="pt-4 flex justify-end gap-2">
