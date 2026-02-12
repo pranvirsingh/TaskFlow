@@ -8,6 +8,7 @@ import ProtectedRoute from "../layouts/ProtectedRoutes";
 import MyProfile_Admin from "../pages/admin/MyProfile";
 import MyProfile from "../pages/user/MyProfile";
 import MemberManager from "../pages/admin/MemberManager";
+import Project from "../pages/admin/Project";
 
 const router = createBrowserRouter([
     {
@@ -44,8 +45,8 @@ const router = createBrowserRouter([
                         element: <MemberManager />
                     },
                     {
-                        path: "tasks",
-                        element: <div>Tasks</div>
+                        path: "project",
+                        element: <Project />
                     },
                     {
                         path: "mytask",

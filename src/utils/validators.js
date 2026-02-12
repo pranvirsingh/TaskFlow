@@ -9,6 +9,18 @@ export const validateFullName = (value) => {
   return ""
 }
 
+export const validateProjectName = (value) => {
+  if (!isRequired(value)) return "Project Name is required"
+  if (value.trim().length < 3) return "Project Name must be at least 3 characters"
+  return ""
+}
+
+export const validateDescription = (value) => {
+  if (!isRequired(value)) return "Description is required"
+  if (value.trim().length < 3) return "Description must be at least 3 characters"
+  return ""
+}
+
 export const validateEmail = (value) => {
   if (!isRequired(value)) return "Email is required"
 

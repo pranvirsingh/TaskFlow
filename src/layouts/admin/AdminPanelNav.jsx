@@ -5,10 +5,10 @@ const AdminPanelNav = ({ isSidebarOpen }) => {
 
     const navItems = [
         { to: "/admin/myprofile", icon: UserCircle, label: "My Profile" },
-        { to: "/admin/projects", icon: FolderKanban, label: "Projects" },
-        { to: "/admin/tasks", icon: ListTodo, label: "Tasks" },
+        { to: "/admin/project", icon: FolderKanban, label: "Project" },
+        // { to: "/admin/tasks", icon: ListTodo, label: "Tasks" },
         { to: "/admin/mytask", icon: CheckSquare, label: "My Tasks" },
-        { to: "/admin/membermanager", icon: User, label: "Member Manager" },
+        { to: "/admin/membermanager", icon: User, label: "Member Manager" }
     ]
 
     return (
