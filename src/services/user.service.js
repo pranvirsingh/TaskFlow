@@ -24,3 +24,8 @@ export const deleteUser = async (id) => {
   const response = await apiClient.delete(`/Member/Delete/${id}`);
   return response.data;
 };
+
+export const assignRole = async (userId, roleId) => {
+  const response = await apiClient.put(`/Member/${userId}/role`, { roleId });
+  return response.data;
+};

@@ -3,12 +3,14 @@ import { Plus, Search, Edit2, Trash2, X } from 'lucide-react';
 import Table from '../../components/common/Table';
 import Modal from '../../components/common/Modal';
 import * as userService from '../../services/user.service';
+import * as roleService from '../../services/role.service';
 import { validateFullName, validateEmail, validateMobile } from '../../utils/validators';
 import Loader from '../../components/common/Loader';
 import toast from 'react-hot-toast';
 
 const MemberManager = () => {
     const [users, setUsers] = useState([]);
+    const [roles, setRoles] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -22,10 +24,31 @@ const MemberManager = () => {
     });
     const [blur, setBlur] = useState(false);
 
-
     useEffect(() => {
         fetchUsers();
+        fetchRoles();
     }, []);
+
+    const fetchRoles = async () => {
+        try {
+            const result = await roleService.getAllRoles();
+            setRoles(result.data || result);
+        } catch (error) {
+            console.error("Failed to fetch roles", error);
+        }
+    };
+
+    const handleRoleChange = async (userId, roleId) => {
+        try {
+            if (!roleId) return;
+            await userService.assignRole(userId, roleId);
+            toast.success("Role assigned successfully");
+            fetchUsers();
+        } catch (error) {
+            toast.error("Failed to assign role");
+            console.error(error);
+        }
+    };
 
     useEffect(() => {
         if (searchQuery) {
@@ -204,7 +227,22 @@ const MemberManager = () => {
         { header: 'Full Name', accessor: 'fullName' },
         { header: 'Email', accessor: 'email' },
         { header: 'Mobile', accessor: 'mobile' },
-        { header: 'Created At', accessor: 'createdAt' }
+        {
+            header: 'Role',
+            render: (row) => (
+                <select
+                    className="px-2 py-1 border border-gray-200 shadow-sm rounded-lg text-sm bg-white focus:outline-none focus:ring focus:ring-purple-200"
+                    value={row.roleId || ""}
+                    onChange={(e) => handleRoleChange(row.id, e.target.value)}
+                >
+                    <option value="" disabled>Select Role</option>
+                    {roles.map(r => (
+                        <option key={r.id} value={r.id}>{r.roleName}</option>
+                    ))}
+                </select>
+            )
+        },
+        { header: 'Created At', render: (row) => new Date(row.createdAt).toLocaleDateString() }
     ];
 
     const renderActions = (row) => (

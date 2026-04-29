@@ -8,7 +8,8 @@ const AdminPanelNav = ({ isSidebarOpen }) => {
         { to: "/admin/project", icon: FolderKanban, label: "Project" },
         // { to: "/admin/tasks", icon: ListTodo, label: "Tasks" },
         { to: "/admin/mytask", icon: CheckSquare, label: "My Tasks" },
-        { to: "/admin/membermanager", icon: User, label: "Member Manager" }
+        { to: "/admin/membermanager", icon: User, label: "Member Manager" },
+        { to: "/admin/roles", icon: UserCircle, label: "Role Management" }
     ]
 
     return (
